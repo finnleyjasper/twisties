@@ -4,28 +4,18 @@ using UnityEngine.UIElements;
 
 public class LeakSpawnControl : MonoBehaviour
 {
-    GameObject leakPrefab;
+    
     WaterControl waterControl;
-
+    [SerializeField] Leak[] leakSpawns;
     [SerializeField] private float defaultSpawnInterval = 4; // seconds between instantiations. should decrease based on WaterControl.CurrentWaterLevel
     private float leakSpawnInterval;
     private float lastSpawnTime = 2; // allow player 3 seconds to orient themself before spawns start
-
+    
     // transform? array? something? -- should know all the possible spots leaks can spawn
 
     void Awake()
     {
         leakSpawnInterval = defaultSpawnInterval;
-
-        try
-        {
-            leakPrefab = Resources.Load<GameObject>("Leak");
-        }
-        catch
-        {
-            Debug.LogWarning("Prefab 'Leak' could not be found for " + gameObject.name);
-        }
-
         waterControl = gameObject.GetComponent<WaterControl>();
     }
 
@@ -33,16 +23,7 @@ public class LeakSpawnControl : MonoBehaviour
     {
         if (Time.time >= lastSpawnTime + leakSpawnInterval)
         {
-            // Transform position = pick a random spot from the availible spawn locations?
-
-            // TEMP TEMP TEMP SHIT
-            // sub in vector 0,0,0 with randomised position
-            // location should also link to the keybind for the leak - ie. location 1 binds to A, etc.
-            GameObject newLeak = Instantiate(leakPrefab, new UnityEngine.Vector3(0,0,1), UnityEngine.Quaternion.identity, gameObject.transform);
-            // TEMP HARDCODED KEYCODE
-            newLeak.GetComponent<Leak>().keyBinding = KeyCode.A;
-
-            lastSpawnTime = Time.time;
+            ChooseLeak();
         }
 
         UpdateSpawnInterval();
@@ -53,5 +34,25 @@ public class LeakSpawnControl : MonoBehaviour
         // eg. if water level is 75 (out of 100), leaks will spawn every 2.5 seconds
         // these are totally arbitrary numbers i pulled out of my ass so will need to test the difficulty
         leakSpawnInterval = defaultSpawnInterval - (waterControl.CurrentWaterLevel / 50);
+    }
+
+    private void ChooseLeak()
+    {
+        int randLeak = Random.Range(0, 8);
+        CheckLeak(randLeak);
+        leakSpawns[randLeak].SpawnLeak();
+        lastSpawnTime = Time.time;
+    }
+
+    private void CheckLeak(int leak)
+    {
+        if (leakSpawns[leak].IsLeaking)
+        {
+            ChooseLeak();
+        }
+        else
+        {
+            return;
+        }
     }
 }
