@@ -46,7 +46,7 @@ public class LeakSpawnControl : MonoBehaviour
 
     private void CheckLeak(int leak)
     {
-        if (leakSpawns[leak].IsLeaking)
+        if (leakSpawns[leak].IsActive)
         {
             ChooseLeak();
         }
