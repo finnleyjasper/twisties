@@ -41,9 +41,10 @@ public class WaterControl : MonoBehaviour
 
         if (currentWater >= maxWater)
         {
-            // SceneManager.LoadScene("End");
             finalScore = Math.Round(Time.time, MidpointRounding.ToEven);
             Debug.Log("Max water reached! Final score: " + finalScore);
+
+            SceneManager.LoadScene("End");
         }
     }
 
@@ -63,7 +64,15 @@ public class WaterControl : MonoBehaviour
             }
         }
 
-        currentWater += waterToAdd;
+        if ((currentWater + waterToAdd) <= 100)
+        {
+            currentWater += waterToAdd;
+        }
+        else
+        {
+            currentWater = 100;
+        }
+
         Debug.Log("Current water level: " + currentWater);
         timeWaterLastAdded = Time.time;
     }
@@ -71,5 +80,28 @@ public class WaterControl : MonoBehaviour
     public int CurrentWaterLevel
     {
         get { return currentWater; }
+    }
+
+    public int CountActiveLeaks()
+    {
+        int count = 0;
+        foreach (Leak leak in leaks)
+        {
+            if (leak.IsLeaking) {count++;}
+        }
+        return count;
+    }
+
+    public bool AnyLeaksHeld()
+    {
+        foreach (Leak leak in leaks)
+        {
+            if (leak.IsHeld)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

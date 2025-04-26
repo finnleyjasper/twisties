@@ -1,7 +1,12 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class Leak : MonoBehaviour
 {
+    // used for the holding sound in soundmanager
+    // different from isLeaking -- isLeaking == false when first spawned, but its also not being held so should play the sound
+    private bool currentlyHeld;
+
     private bool isLeaking = false;
     private bool isActive = false;
     [SerializeField] private float holdTime; // how long the leak needs to be held before it is deactivated
@@ -14,11 +19,22 @@ public class Leak : MonoBehaviour
     private ParticleSystem leak;
     private GameObject heldPopup;
 
+    // sound
+    private AudioSource audioSource;
+    [SerializeField] private AudioClip spawnSound;
+    [SerializeField] private AudioClip[] fixedSounds;
+
+    [SerializeField] private DecalProjector decalProjector;
+
     void Awake()
     {
+        decalProjector = GetComponentInChildren<DecalProjector>();
+        decalProjector.enabled = false;
+
         spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer.enabled = false;
         leak = GetComponentInChildren<ParticleSystem>();
-        holdTime = Random.Range(3, 6); // need to be held between 3-9 seconds
+        holdTime = Random.Range(3, 6); // need to be held between 3-6 seconds
 
         try
         {
@@ -28,12 +44,18 @@ public class Leak : MonoBehaviour
         {
             Debug.LogWarning("Prefab 'HeldPopup' could not be found for " + gameObject.name);
         }
+
+        audioSource = GetComponent<AudioSource>();
+        audioSource.loop = false;
     }
 
     void Update()
     {
         // is this leak being held?
         if (isActive) {
+
+            Debug.Log("Leak is active!");
+
             if (Input.GetKeyDown(keyBinding)) // spawn the "held" popup on button down
             {
                 leak.Stop();
@@ -42,6 +64,7 @@ public class Leak : MonoBehaviour
             if (Input.GetKey(keyBinding)) // do stuff while the leak is held
             {
                 isLeaking = false;
+                currentlyHeld = true;
                 spriteRenderer.color = Color.white;
                 leak.Stop();
                 AddHoldTime();
@@ -58,14 +81,22 @@ public class Leak : MonoBehaviour
                 currentHoldTime = 0;
 
                 isLeaking = true;
-                
+                currentlyHeld = false;
+
                 Debug.Log("Leak " + gameObject.name + " is active");
             }
 
             // if the leak is fixed destroy this leak and its popup
             if (currentHoldTime >= holdTime)
             {
+                // play sfx
+                int sfxIndex = Random.Range(0, 2);
+                AudioClip clip = fixedSounds[sfxIndex];
+                // hard coded name <3
+                GameObject.Find("Game/Leak Manager").GetComponent<SoundManager>().PlayFixedSound(clip);
+
                 isLeaking = false; // i dont think we need this but whatever
+                currentlyHeld = false;
                 if (heldPopup != null)
                 {
                     Destroy(heldPopup);
@@ -77,7 +108,7 @@ public class Leak : MonoBehaviour
                 isActive = false;
             }
         }
-        
+
     }
 
     private void AddHoldTime()
@@ -99,9 +130,17 @@ public class Leak : MonoBehaviour
         get { return isActive; }
     }
 
+    public bool IsHeld
+    {
+        get { return currentlyHeld; }
+    }
+
     public void SpawnLeak()
     {
+        // temp
         spriteRenderer.enabled = true;
+
+        decalProjector.enabled = true;
         isActive = true;
         Invoke("StartLeak", 1);
     }
@@ -110,10 +149,13 @@ public class Leak : MonoBehaviour
     {
         if (!Input.GetKey(keyBinding))
         {
+            decalProjector.enabled = false;
+            audioSource.clip = spawnSound;
+            audioSource.Play();
             leak.Play();
             isLeaking = true;
         }
-        
+
     }
-    
+
 }
