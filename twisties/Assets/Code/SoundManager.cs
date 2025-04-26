@@ -1,5 +1,3 @@
-// 25/04
-// i dont know why the hell i didnt just use one audio source and multiple clips but we're here now
 
 using System.Linq;
 using UnityEngine;
@@ -17,12 +15,15 @@ public class SoundManager : MonoBehaviour
     public float normalCutoff = 5000f;
     public float normalWet = -80f;
 
+    // almost certainly a better way to do this but... we're here now
     // running water sound
     public AudioSource leakingWaterAudioSource;
     // another for the holding sound
     public AudioSource holdingAudioSource;
+    // aaannnnd another for the fixed sounds
+    // this is here and not per-leak because the leak gets destroyed as the same plays
+    public AudioSource fixedAudioSource;
 
-    // Update is called once per frame
     void Update()
     {
         MuffleSound();
@@ -67,22 +68,30 @@ public class SoundManager : MonoBehaviour
     {
         waterLevel = gameObject.GetComponent<WaterControl>().CurrentWaterLevel;
 
-        if (normalCutoff  - (waterLevel * 60) > 0)
+        if (normalCutoff  - (waterLevel * 60) - 10 > 0)
         {
-            audioMixer.SetFloat("lowPass", normalCutoff - (waterLevel * 60));
+            audioMixer.SetFloat("lowPass", normalCutoff - (waterLevel * 60) - 10);
         }
         else
         {
             audioMixer.SetFloat("lowPass", 0.1f);
         }
 
-        if (normalWet + (waterLevel * 1f) < 0)
+        if (normalWet + (waterLevel * 1f) + 5 < 0)
         {
-            audioMixer.SetFloat("wet", normalWet + (waterLevel * 1f));
+            audioMixer.SetFloat("wet", normalWet + (waterLevel * 1f) + 5);
         }
         else
         {
             audioMixer.SetFloat("wet", -0.1f);
         }
+    }
+
+    // called by the leak, passing in the clip randomly generated within the leak
+    // calls this method in soundmanager and not within leak as the leak is destroyed
+    public void PlayFixedSound(AudioClip clip)
+    {
+        fixedAudioSource.clip = clip;
+        fixedAudioSource.Play();
     }
 }

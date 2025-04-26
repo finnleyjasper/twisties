@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class Leak : MonoBehaviour
 {
@@ -21,11 +22,17 @@ public class Leak : MonoBehaviour
     // sound
     private AudioSource audioSource;
     [SerializeField] private AudioClip spawnSound;
-    [SerializeField] private AudioClip[] completeSounds;
+    [SerializeField] private AudioClip[] fixedSounds;
+
+    [SerializeField] private DecalProjector decalProjector;
 
     void Awake()
     {
+        decalProjector = GetComponentInChildren<DecalProjector>();
+        decalProjector.enabled = false;
+
         spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer.enabled = false;
         leak = GetComponentInChildren<ParticleSystem>();
         holdTime = Random.Range(3, 6); // need to be held between 3-6 seconds
 
@@ -46,6 +53,9 @@ public class Leak : MonoBehaviour
     {
         // is this leak being held?
         if (isActive) {
+
+            Debug.Log("Leak is active!");
+
             if (Input.GetKeyDown(keyBinding)) // spawn the "held" popup on button down
             {
                 leak.Stop();
@@ -81,8 +91,9 @@ public class Leak : MonoBehaviour
             {
                 // play sfx
                 int sfxIndex = Random.Range(0, 2);
-                audioSource.clip = completeSounds[sfxIndex];
-                audioSource.Play();
+                AudioClip clip = fixedSounds[sfxIndex];
+                // hard coded name <3
+                GameObject.Find("Game/Leak Manager").GetComponent<SoundManager>().PlayFixedSound(clip);
 
                 isLeaking = false; // i dont think we need this but whatever
                 currentlyHeld = false;
@@ -126,7 +137,10 @@ public class Leak : MonoBehaviour
 
     public void SpawnLeak()
     {
+        // temp
         spriteRenderer.enabled = true;
+
+        decalProjector.enabled = true;
         isActive = true;
         Invoke("StartLeak", 1);
     }
@@ -135,6 +149,7 @@ public class Leak : MonoBehaviour
     {
         if (!Input.GetKey(keyBinding))
         {
+            decalProjector.enabled = false;
             audioSource.clip = spawnSound;
             audioSource.Play();
             leak.Play();
