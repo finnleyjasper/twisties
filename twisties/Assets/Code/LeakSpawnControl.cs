@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -30,24 +32,16 @@ public class LeakSpawnControl : MonoBehaviour
     {
         leakSpawnInterval = defaultSpawnInterval - (Time.timeSinceLevelLoad / 20);
     }
-
     private void ChooseLeak()
     {
-        int randLeak = Random.Range(0, 8);
-        CheckLeak(randLeak);
-        leakSpawns[randLeak].SpawnLeak();
-        lastSpawnTime = Time.timeSinceLevelLoad;
-    }
 
-    private void CheckLeak(int leak)
-    {
-        if (leakSpawns[leak].IsActive)
+        Leak[] possible = leakSpawns.Where(l => !l.IsActive).ToArray();
+
+        if (possible.Length > 0)
         {
-            ChooseLeak();
-        }
-        else
-        {
-            return;
+            possible[Random.Range(0, possible.Length)].SpawnLeak();
+            lastSpawnTime = Time.timeSinceLevelLoad;
         }
     }
+    
 }
