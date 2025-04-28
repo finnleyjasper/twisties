@@ -20,30 +20,32 @@ using System;
 public class WaterControl : MonoBehaviour
 {
     public int maxWater = 100;
-    private int currentWater = 0;
+    [SerializeField] private int currentWater = 0;
 
     private float timeWaterLastAdded = 0;
     [SerializeField] private int increasePerLeak = 1; // how much to add to waterCount each second, per active leak
-
+    [SerializeField] private WaterLevelUI waterLevelUI;
     public Leak[] leaks; // all leaks - both held and active
 
-    public double finalScore = 0;
+    public int finalScore = 0;
 
     // [SerializeField] private GameObject waterAnimation;
 
+    
     void Update()
     {
         // if its been one second since the water was last added... add it
-        if (Time.time >= timeWaterLastAdded + 1) // should this be delta time? does that matter here?
+        if (Time.timeSinceLevelLoad >= timeWaterLastAdded + 1) // should this be delta time? does that matter here?
         {
             IncreaseWater();
         }
 
         if (currentWater >= maxWater)
         {
-            finalScore = Math.Round(Time.time, MidpointRounding.ToEven);
+            currentWater = 0;
+            finalScore = (int)Math.Round(Time.timeSinceLevelLoad, MidpointRounding.ToEven);
             Debug.Log("Max water reached! Final score: " + finalScore);
-
+            PlayerPrefs.SetInt("score", finalScore);
             SceneManager.LoadScene("End");
         }
     }
@@ -63,7 +65,7 @@ public class WaterControl : MonoBehaviour
                 waterToAdd += increasePerLeak;
             }
         }
-
+        waterLevelUI.SetWaterLevel(currentWater);
         if ((currentWater + waterToAdd) <= 100)
         {
             currentWater += waterToAdd;
@@ -71,10 +73,10 @@ public class WaterControl : MonoBehaviour
         else
         {
             currentWater = 100;
+            
         }
-
         Debug.Log("Current water level: " + currentWater);
-        timeWaterLastAdded = Time.time;
+        timeWaterLastAdded = Time.timeSinceLevelLoad;
     }
 
     public int CurrentWaterLevel
@@ -104,4 +106,5 @@ public class WaterControl : MonoBehaviour
 
         return false;
     }
+   
 }

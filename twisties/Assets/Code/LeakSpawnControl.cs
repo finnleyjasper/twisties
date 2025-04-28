@@ -18,7 +18,7 @@ public class LeakSpawnControl : MonoBehaviour
 
     void Update()
     {
-        if (Time.time >= lastSpawnTime + leakSpawnInterval)
+        if (Time.timeSinceLevelLoad >= lastSpawnTime + leakSpawnInterval)
         {
             ChooseLeak();
         }
@@ -28,7 +28,7 @@ public class LeakSpawnControl : MonoBehaviour
 
     private void UpdateSpawnInterval()
     {
-        leakSpawnInterval = defaultSpawnInterval - (Time.time / 20);
+        leakSpawnInterval = defaultSpawnInterval - (Time.timeSinceLevelLoad / 20);
     }
 
     private void ChooseLeak()
@@ -36,7 +36,7 @@ public class LeakSpawnControl : MonoBehaviour
         int randLeak = Random.Range(0, 8);
         CheckLeak(randLeak);
         leakSpawns[randLeak].SpawnLeak();
-        lastSpawnTime = Time.time;
+        lastSpawnTime = Time.timeSinceLevelLoad;
     }
 
     private void CheckLeak(int leak)
