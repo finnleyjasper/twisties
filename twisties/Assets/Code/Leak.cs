@@ -7,6 +7,8 @@ public class Leak : MonoBehaviour
     // different from isLeaking -- isLeaking == false when first spawned, but its also not being held so should play the sound
     private bool currentlyHeld;
 
+    private bool hasBurst = false; // becomes active, then bursts, then leaks
+
     private bool isLeaking = false;
     private bool isActive = false;
     [SerializeField] private float holdTime; // how long the leak needs to be held before it is deactivated
@@ -16,8 +18,10 @@ public class Leak : MonoBehaviour
     [SerializeField] private KeyCode keyBinding; // set in inspector for each object
     private SpriteRenderer spriteRenderer;
     private GameObject heldPopupPrefab;
+    private GameObject warningPopupPrefab;
     private ParticleSystem leak;
     private GameObject heldPopup;
+    private GameObject warningPopup;
 
     // sound
     private AudioSource audioSource;
@@ -25,11 +29,13 @@ public class Leak : MonoBehaviour
     [SerializeField] private AudioClip[] fixedSounds;
 
     [SerializeField] private DecalProjector decalProjector;
+    [SerializeField] private GameObject brokenModel;
 
     void Awake()
     {
         decalProjector = GetComponentInChildren<DecalProjector>();
         decalProjector.enabled = false;
+        brokenModel.SetActive(false);
 
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.enabled = false;
@@ -39,10 +45,11 @@ public class Leak : MonoBehaviour
         try
         {
             heldPopupPrefab = Resources.Load<GameObject>("HeldPopup");
+            warningPopupPrefab = Resources.Load<GameObject>("WarningPopup");
         }
         catch
         {
-            Debug.LogWarning("Prefab 'HeldPopup' could not be found for " + gameObject.name);
+            Debug.LogWarning("Prefab(s) ould not be found for " + gameObject.name);
         }
 
         audioSource = GetComponent<AudioSource>();
@@ -56,12 +63,12 @@ public class Leak : MonoBehaviour
 
             Debug.Log("Leak is active!");
 
-            if (Input.GetKeyDown(keyBinding)) // spawn the "held" popup on button down
+            if (Input.GetKeyDown(keyBinding) && hasBurst) // spawn the "held" popup on button down
             {
                 leak.Stop();
                 heldPopup = Instantiate(heldPopupPrefab, transform.position, Quaternion.identity);
             }
-            if (Input.GetKey(keyBinding)) // do stuff while the leak is held
+            if (Input.GetKey(keyBinding)&& hasBurst) // do stuff while the leak is held
             {
                 isLeaking = false;
                 currentlyHeld = true;
@@ -105,6 +112,8 @@ public class Leak : MonoBehaviour
                 currentHoldTime = 0;
                 leak.Stop();
                 spriteRenderer.enabled = false;
+                decalProjector.enabled = true;
+                brokenModel.SetActive(false);
                 isActive = false;
             }
         }
@@ -140,20 +149,29 @@ public class Leak : MonoBehaviour
         // temp
         spriteRenderer.enabled = true;
 
-        decalProjector.enabled = true;
+        warningPopup = Instantiate(warningPopupPrefab, transform.position, Quaternion.identity);
+
         isActive = true;
         Invoke("StartLeak", 1);
     }
 
     private void StartLeak()
     {
+        hasBurst = true;
+        Destroy(warningPopup);
+        brokenModel.SetActive(true);
+
         if (!Input.GetKey(keyBinding))
         {
-            decalProjector.enabled = false;
             audioSource.clip = spawnSound;
             audioSource.Play();
             leak.Play();
             isLeaking = true;
+        }
+
+        if (decalProjector.enabled)
+        {
+            decalProjector.enabled = false;
         }
 
     }

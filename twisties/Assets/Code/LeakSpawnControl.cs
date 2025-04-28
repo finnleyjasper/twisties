@@ -4,19 +4,16 @@ using UnityEngine.UIElements;
 
 public class LeakSpawnControl : MonoBehaviour
 {
-    
-    WaterControl waterControl;
+
     [SerializeField] Leak[] leakSpawns;
     [SerializeField] private float defaultSpawnInterval = 4; // seconds between instantiations. should decrease based on WaterControl.CurrentWaterLevel
-    private float leakSpawnInterval;
+    [SerializeField] private float leakSpawnInterval;
     private float lastSpawnTime = 2; // allow player 3 seconds to orient themself before spawns start
-    
-    // transform? array? something? -- should know all the possible spots leaks can spawn
+
 
     void Awake()
     {
         leakSpawnInterval = defaultSpawnInterval;
-        waterControl = gameObject.GetComponent<WaterControl>();
     }
 
     void Update()
@@ -31,9 +28,7 @@ public class LeakSpawnControl : MonoBehaviour
 
     private void UpdateSpawnInterval()
     {
-        // eg. if water level is 75 (out of 100), leaks will spawn every 2.5 seconds
-        // these are totally arbitrary numbers i pulled out of my ass so will need to test the difficulty
-        leakSpawnInterval = defaultSpawnInterval - (waterControl.CurrentWaterLevel / 50);
+        leakSpawnInterval = defaultSpawnInterval - (Time.time / 20);
     }
 
     private void ChooseLeak()

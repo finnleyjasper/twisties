@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5517662720050829579}
   - component: {fileID: 8769314118938286632}
   m_Layer: 0
-  m_Name: HeldPopup
+  m_Name: WarningPopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26,13 +26,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1995764392470871008}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.04608767, y: -0.03877461, z: -0.5719282}
+  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
+  m_LocalPosition: {x: -0.25, y: -0.03877461, z: -0.5719282}
   m_LocalScale: {x: 0.23637731, y: 0.23637731, z: 0.23637731}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
 --- !u!114 &5517662720050829579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -91,7 +91,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: c1f3ff6fce87547d8bc0d2c8947dbbbf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b01376f1e180e4565849a5dcee621648, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
