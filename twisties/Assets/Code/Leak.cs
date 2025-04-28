@@ -63,12 +63,12 @@ public class Leak : MonoBehaviour
 
             Debug.Log("Leak is active!");
 
-            if (Input.GetKeyDown(keyBinding) && hasBurst) // spawn the "held" popup on button down
+            if (Input.GetKeyDown(keyBinding)) // spawn the "held" popup on button down
             {
                 leak.Stop();
                 heldPopup = Instantiate(heldPopupPrefab, transform.position, Quaternion.identity);
             }
-            if (Input.GetKey(keyBinding)&& hasBurst) // do stuff while the leak is held
+            if (Input.GetKey(keyBinding)) // do stuff while the leak is held
             {
                 isLeaking = false;
                 currentlyHeld = true;
@@ -122,10 +122,10 @@ public class Leak : MonoBehaviour
 
     private void AddHoldTime()
     {
-        if (Time.time >= lastSecondHeld + 1) // if its been a second
+        if (Time.timeSinceLevelLoad >= lastSecondHeld + 1) // if its been a second
         {
             currentHoldTime += 1;
-            lastSecondHeld = Time.time;
+            lastSecondHeld = Time.timeSinceLevelLoad;
         }
     }
 
