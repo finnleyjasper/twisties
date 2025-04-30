@@ -26,6 +26,7 @@ public class Leak : MonoBehaviour
     // sound
     private AudioSource audioSource;
     [SerializeField] private AudioClip spawnSound;
+    [SerializeField] private AudioClip aboutToBreakSound;
     [SerializeField] private AudioClip[] fixedSounds;
 
     [SerializeField] private DecalProjector decalProjector;
@@ -146,6 +147,9 @@ public class Leak : MonoBehaviour
 
     public void SpawnLeak()
     {
+        audioSource.clip = aboutToBreakSound;
+        audioSource.Play();
+
         // temp
         spriteRenderer.enabled = true;
 

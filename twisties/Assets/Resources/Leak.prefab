@@ -112,6 +112,7 @@ MonoBehaviour:
   currentHoldTime: 0
   keyBinding: 97
   spawnSound: {fileID: 8300000, guid: f4b7b8e8caf9846aab9e69fb03312a5b, type: 3}
+  aboutToBreakSound: {fileID: 8300000, guid: 7551edf2b1a384fa7b523e9303481b5f, type: 3}
   fixedSounds:
   - {fileID: 8300000, guid: f9999a504fd294ec58f550130ff923df, type: 3}
   - {fileID: 8300000, guid: e0cd2ea424f404d1a960ccb7b75abac4, type: 3}
