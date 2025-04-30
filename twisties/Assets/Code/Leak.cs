@@ -151,7 +151,7 @@ public class Leak : MonoBehaviour
         audioSource.Play();
 
         // temp
-        spriteRenderer.enabled = true;
+       //spriteRenderer.enabled = true;
 
         warningPopup = Instantiate(warningPopupPrefab, transform.position, Quaternion.identity);
 
